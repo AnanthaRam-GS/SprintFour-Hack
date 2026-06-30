@@ -6,6 +6,10 @@ import { ActionBar } from "@/components/shared/ActionBar";
 import { AuditPanel } from "@/components/shared/AuditPanel";
 import { DocumentViewer } from "@/components/shared/DocumentViewer";
 import { ExportButton } from "@/components/shared/ExportButton";
+import { AuditSummaryHeader } from "@/components/trust/AuditSummaryHeader";
+import { ExplanationPanel } from "@/components/trust/ExplanationPanel";
+import { ThresholdSlider } from "@/components/trust/ThresholdSlider";
+import { WhyNotInspector } from "@/components/trust/WhyNotInspector";
 import { analyzeDocument, recordReviewDecision } from "@/lib/api";
 import { useDocumentStore } from "@/store/documentStore";
 
@@ -20,14 +24,17 @@ export default function TrustPage() {
   const [filename, setFilename] = useState("trust-sample.txt");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedText, setSelectedText] = useState("");
 
   const sessionId = useDocumentStore((state) => state.sessionId);
   const spans = useDocumentStore((state) => state.spans);
   const decisions = useDocumentStore((state) => state.decisions);
   const activeSpanId = useDocumentStore((state) => state.activeSpanId);
   const actionHistory = useDocumentStore((state) => state.actionHistory);
+  const threshold = useDocumentStore((state) => state.threshold);
   const loadAnalysis = useDocumentStore((state) => state.loadAnalysis);
   const setActiveSpan = useDocumentStore((state) => state.setActiveSpan);
+  const setThreshold = useDocumentStore((state) => state.setThreshold);
   const recordDecision = useDocumentStore((state) => state.recordDecision);
   const undoLastDecision = useDocumentStore((state) => state.undoLastDecision);
   const getActiveSpan = useDocumentStore((state) => state.getActiveSpan);
@@ -35,6 +42,18 @@ export default function TrustPage() {
 
   const activeSpan = getActiveSpan();
   const visibleSpans = getVisibleSpans();
+
+  const handleDocumentMouseUp = () => {
+    const selection = window.getSelection();
+    const nextSelectedText = selection?.toString().trim() ?? "";
+
+    if (!nextSelectedText || nextSelectedText.length > 160) {
+      setSelectedText("");
+      return;
+    }
+
+    setSelectedText(nextSelectedText);
+  };
 
   const handleDecision = async (spanId: string, action: "accept" | "reject") => {
     if (!sessionId) {
@@ -71,6 +90,7 @@ export default function TrustPage() {
         mode: "trust",
       });
       loadAnalysis(result);
+      setSelectedText("");
     } catch (caughtError) {
       setError(
         caughtError instanceof Error
@@ -91,13 +111,11 @@ export default function TrustPage() {
               Trust Mode / Marcus
             </p>
             <h1 className="text-3xl font-semibold tracking-tight text-stone-950">
-              Integrated review-engine demo
+              Trust &amp; Explainability
             </h1>
             <p className="max-w-3xl text-sm leading-7 text-stone-600">
-              This page exercises the shared document review engine against the
-              live analyze API. It is intentionally simple so we can validate
-              trust-oriented review interactions before building the final mode
-              experience.
+              For Marcus: review every redaction with evidence before sharing
+              the document.
             </p>
           </div>
 
@@ -129,8 +147,6 @@ export default function TrustPage() {
               >
                 {isLoading ? "Analyzing..." : "Analyze document"}
               </button>
-
-              <ExportButton sessionId={sessionId} />
             </div>
           </div>
 
@@ -141,8 +157,32 @@ export default function TrustPage() {
           ) : null}
         </section>
 
-        <section className="grid gap-6 xl:grid-cols-[minmax(0,1.5fr)_minmax(320px,0.8fr)]">
+        <section className="grid gap-6 xl:grid-cols-[minmax(0,1.45fr)_minmax(320px,0.85fr)]">
           <div className="space-y-6">
+            <AuditSummaryHeader spans={spans} threshold={threshold} />
+            <ThresholdSlider
+              threshold={threshold}
+              onChange={(value) => setThreshold(value)}
+            />
+
+            <div onMouseUp={handleDocumentMouseUp}>
+              <DocumentViewer
+                text={text}
+                spans={visibleSpans}
+                activeSpanId={activeSpanId}
+                onSpanClick={(span) => setActiveSpan(span.id)}
+              />
+            </div>
+
+            <WhyNotInspector
+              selectedText={selectedText}
+              onClear={() => setSelectedText("")}
+            />
+          </div>
+
+          <div className="space-y-6">
+            <ExplanationPanel activeSpan={activeSpan} />
+
             <ActionBar
               activeSpan={activeSpan}
               onAccept={(span) => {
@@ -156,15 +196,21 @@ export default function TrustPage() {
               canUndo={actionHistory.length > 0}
             />
 
-            <DocumentViewer
-              text={text}
-              spans={visibleSpans}
-              activeSpanId={activeSpanId}
-              onSpanClick={(span) => setActiveSpan(span.id)}
-            />
-          </div>
+            <AuditPanel spans={spans} decisions={decisions} />
 
-          <AuditPanel spans={spans} decisions={decisions} />
+            <div className="rounded-[2rem] border border-stone-200 bg-white p-5 shadow-sm">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">
+                Export
+              </p>
+              <p className="mt-2 text-sm leading-7 text-stone-600">
+                Download the current redacted document and audit log bundle for
+                final handoff.
+              </p>
+              <div className="mt-4">
+                <ExportButton sessionId={sessionId} />
+              </div>
+            </div>
+          </div>
         </section>
       </div>
     </main>
