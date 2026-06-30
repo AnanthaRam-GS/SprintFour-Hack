@@ -33,7 +33,7 @@ type SelectedRange = {
 
 export default function CorrectionPage() {
   const [text, setText] = useState(DEFAULT_TEXT);
-  const [filename, setFilename] = useState("correction-sample.txt");
+  const [filename, setFilename] = useState("correction-review-note.txt");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [bannerAcknowledged, setBannerAcknowledged] = useState(false);

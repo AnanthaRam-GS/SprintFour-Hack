@@ -32,17 +32,12 @@ export function ModeNav() {
         <div className="space-y-1">
           <Link
             href="/"
-            className="flex items-center gap-2 group"
+            className="text-lg font-bold tracking-tight text-stone-950 hover:text-emerald-700 transition-colors"
           >
-            <span className="text-lg font-bold tracking-tight text-stone-950 group-hover:text-emerald-700 transition-colors">
-              Conseal
-            </span>
-            <span className="rounded-full bg-stone-100/80 px-2 py-0.5 text-[11px] font-medium text-stone-600 border border-stone-200/50">
-              AI Privacy Review
-            </span>
+            Conseal
           </Link>
-          <p className="text-xs text-stone-500">
-            Review sensitive information before sharing documents with AI.
+          <p className="text-xs text-stone-555">
+            AI-safe document review for sensitive information.
           </p>
         </div>
 

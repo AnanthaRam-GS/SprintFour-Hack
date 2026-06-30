@@ -16,12 +16,14 @@ import { useDocumentStore } from "@/store/documentStore";
 const DEFAULT_TEXT = `Patient intake summary
 
 Dr. Sarah Chen reviewed the referral before forwarding it to Stanford for specialist triage.
+
 For follow-up, contact s.chen@hospital.org or call (415) 555-0194.
+
 Legacy records still list SSN 482-73-1920 on the intake cover sheet.`;
 
 export default function TrustPage() {
   const [text, setText] = useState(DEFAULT_TEXT);
-  const [filename, setFilename] = useState("trust-sample.txt");
+  const [filename, setFilename] = useState("sensitive-intake-note.txt");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedText, setSelectedText] = useState("");
@@ -114,7 +116,7 @@ export default function TrustPage() {
               Trust Review
             </h1>
             <p className="max-w-3xl text-sm leading-7 text-stone-600">
-              Understand why each sensitive item was flagged before exporting a safe copy. Inspect every detected sensitive item with confidence scores, reasoning, and a complete review trail.
+              Inspect every detected sensitive item with confidence scores, reasoning, and a complete review trail.
             </p>
           </div>
 
