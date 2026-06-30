@@ -23,7 +23,7 @@ const navItems: NavItem[] = [
   {
     href: "/batch",
     title: "Batch Mode",
-    subtitle: "Maya",
+    subtitle: "Maya / lightweight queue",
   },
 ];
 
@@ -41,7 +41,8 @@ export function ModeNav() {
             Conseal Hackathon
           </Link>
           <p className="mt-1 text-sm text-stone-600">
-            Shared review engine for trust, correction, and batch workflows.
+            Shared review engine for trust, correction, and lightweight batch
+            review workflows.
           </p>
         </div>
 

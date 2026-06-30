@@ -22,8 +22,8 @@ const modeCards = [
     title: "Batch Mode",
     persona: "Maya",
     description:
-      "Prepare the shared engine for high-volume review workflows and document throughput.",
-    emphasis: "Secondary stretch mode",
+      "Run a lightweight high-volume workflow with frontend-driven uploads, per-file review, and individual exports.",
+    emphasis: "Lightweight bonus workflow",
   },
 ];
 
@@ -41,8 +41,8 @@ export default function Home() {
           </h1>
           <p className="mt-4 max-w-3xl text-lg leading-8 text-stone-300">
             Trust Mode and Correction Mode are the primary MVP tracks. This app
-            shell is set up to let us exercise the same review engine across all
-            three personas.
+            shell also includes a lightweight Batch Mode so we can demo
+            higher-volume review without a backend queue or bulk ZIP pipeline.
           </p>
         </section>
 
