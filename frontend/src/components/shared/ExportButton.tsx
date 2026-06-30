@@ -1,3 +1,5 @@
+import { getExportUrl } from "@/lib/api";
+
 type ExportButtonProps = {
   sessionId: string | null;
   disabled?: boolean;
@@ -15,8 +17,7 @@ export function ExportButton({
     if (isDisabled) {
       return;
     }
-
-    window.alert("Export API will be connected in the next phase.");
+    window.location.href = getExportUrl(sessionId);
   };
 
   return (

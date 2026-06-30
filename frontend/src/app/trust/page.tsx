@@ -6,7 +6,7 @@ import { ActionBar } from "@/components/shared/ActionBar";
 import { AuditPanel } from "@/components/shared/AuditPanel";
 import { DocumentViewer } from "@/components/shared/DocumentViewer";
 import { ExportButton } from "@/components/shared/ExportButton";
-import { analyzeDocument } from "@/lib/api";
+import { analyzeDocument, recordReviewDecision } from "@/lib/api";
 import { useDocumentStore } from "@/store/documentStore";
 
 const DEFAULT_TEXT = `Patient intake summary
@@ -35,6 +35,30 @@ export default function TrustPage() {
 
   const activeSpan = getActiveSpan();
   const visibleSpans = getVisibleSpans();
+
+  const handleDecision = async (spanId: string, action: "accept" | "reject") => {
+    if (!sessionId) {
+      setError("No active backend session is available for this review.");
+      return;
+    }
+
+    setError(null);
+    recordDecision(spanId, action);
+
+    try {
+      await recordReviewDecision({
+        session_id: sessionId,
+        span_id: spanId,
+        action,
+      });
+    } catch (caughtError) {
+      setError(
+        caughtError instanceof Error
+          ? caughtError.message
+          : "Decision request failed.",
+      );
+    }
+  };
 
   const handleAnalyze = async () => {
     setIsLoading(true);
@@ -121,8 +145,13 @@ export default function TrustPage() {
           <div className="space-y-6">
             <ActionBar
               activeSpan={activeSpan}
-              onAccept={(span) => recordDecision(span.id, "accept")}
-              onReject={(span) => recordDecision(span.id, "reject")}
+              onAccept={(span) => {
+                void handleDecision(span.id, "accept");
+              }}
+              onReject={(span) => {
+                void handleDecision(span.id, "reject");
+              }}
+              // Undo is local-only in the MVP until backend audit reversal is implemented.
               onUndo={undoLastDecision}
               canUndo={actionHistory.length > 0}
             />
