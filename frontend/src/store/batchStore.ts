@@ -53,6 +53,8 @@ type BatchState = {
   getThroughput: () => BatchThroughput;
 };
 
+export type { BatchCounts, BatchThroughput };
+
 const initialState = {
   jobs: [],
   activeJobId: null,
