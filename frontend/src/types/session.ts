@@ -1,4 +1,4 @@
-import type { SpanAction, SpanType } from "@/types/span";
+import type { Span, SpanAction, SpanType } from "@/types/span";
 
 export interface AuditEntry {
   timestamp: string;
@@ -16,4 +16,16 @@ export interface BatchJob {
   session_id?: string | null;
   span_count?: number | null;
   processed_at?: string | null;
+}
+
+export interface DecisionRequest {
+  session_id: string;
+  span_id: string;
+  action: SpanAction;
+  new_span?: Span;
+}
+
+export interface DecisionResponse {
+  ok: boolean;
+  audit_entry: AuditEntry;
 }
