@@ -3,6 +3,7 @@ import io
 import json
 import zipfile
 from datetime import datetime, timezone
+from pathlib import Path
 
 from models import Session
 from services.redactor import redact_text
@@ -13,9 +14,16 @@ def _sanitize_filename(filename: str) -> str:
     return sanitized or "document.txt"
 
 
+def _build_redacted_filename(filename: str) -> str:
+    path = Path(filename)
+    stem = path.stem or "document"
+    suffix = path.suffix or ".txt"
+    return f"redacted_{stem}{suffix}"
+
+
 def build_session_export_zip(session: Session) -> bytes:
     original_filename = _sanitize_filename(session.document.filename)
-    redacted_filename = f"redacted_{original_filename}.txt"
+    redacted_filename = _build_redacted_filename(original_filename)
     redacted_document = redact_text(session.document.text, session.spans)
 
     reviewed_spans = sum(1 for span in session.spans if span.decision is not None)
