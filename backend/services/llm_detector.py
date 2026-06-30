@@ -8,28 +8,36 @@ import httpx
 from config import load_backend_env
 from models import Span, SpanType
 
-SYSTEM_PROMPT = "You are a strict PII detection engine. Return only valid JSON."
+SYSTEM_PROMPT = (
+    "You are a strict PII detection engine. Return only valid JSON. "
+    "Do not include explanations outside JSON."
+)
 
 
-def _build_prompt(text: str, mode: str) -> str:
-    return f"""Analyze the following document for personally identifiable information.
+def _build_prompt(text: str) -> str:
+    return f"""Analyze the document and identify personally identifiable or sensitive information that should be reviewed before sharing with an AI tool.
 
-Mode: {mode}
+Return ONLY a JSON array. Each item must be:
+{{
+  "text": "exact text from the document",
+  "type": "NAME|EMAIL|PHONE|SSN|ADDRESS|DATE_OF_BIRTH|ID_NUMBER|CREDIT_CARD|OTHER",
+  "confidence": 0.0-1.0,
+  "explanation": "short reason",
+  "pattern_matched": "semantic reason or pattern"
+}}
 
-Return ONLY a JSON array with no markdown, no prose, and no explanation outside the array:
-[
-  {{
-    "start": 0,
-    "end": 0,
-    "text": "exact matched text",
-    "type": "NAME|EMAIL|PHONE|SSN|ADDRESS|DATE_OF_BIRTH|ID_NUMBER|CREDIT_CARD|OTHER",
-    "confidence": 0.0,
-    "explanation": "short explanation",
-    "pattern_matched": "short pattern"
-  }}
-]
-
-If no PII is found, return [].
+Rules:
+- Detect full person names such as David Wilson or Emma Rodriguez.
+- Detect email addresses.
+- Detect phone numbers.
+- Detect employee IDs, account numbers, ticket IDs, insurance references, and case numbers as ID_NUMBER.
+- Detect residential or mailing addresses as ADDRESS.
+- Do not mark headings like "Client Investment Review", "Account Number", or "Residential Address" as names.
+- For labels like "Account Number:" followed by "ACC-98176234", mark only the value ACC-98176234.
+- For labels like "Residential Address:" followed by address lines, mark only the actual address lines.
+- Use exact text from the document.
+- If unsure, include the item with lower confidence.
+- Return [] if there is no PII.
 
 Document:
 {text}
@@ -55,6 +63,17 @@ def _strip_json_fences(content: str) -> str:
     return cleaned
 
 
+def _extract_json_array(content: str) -> str:
+    cleaned = _strip_json_fences(content)
+    start = cleaned.find("[")
+    end = cleaned.rfind("]")
+    if start == -1 or end == -1 or end < start:
+        raise RuntimeError(
+            f"LLM response did not contain a JSON array. Preview: {cleaned[:500]}"
+        )
+    return cleaned[start : end + 1]
+
+
 def _coerce_span_type(raw_type: Any) -> SpanType:
     if isinstance(raw_type, str):
         normalized = raw_type.strip().upper()
@@ -65,40 +84,31 @@ def _coerce_span_type(raw_type: Any) -> SpanType:
     return SpanType.OTHER
 
 
-def _coerce_int(value: Any) -> Optional[int]:
-    if isinstance(value, bool):
-        return None
-    if isinstance(value, int):
-        return value
-    if isinstance(value, float) and value.is_integer():
-        return int(value)
-    return None
-
-
 def _coerce_confidence(value: Any) -> float:
     if isinstance(value, (int, float)) and not isinstance(value, bool):
         return max(0.0, min(1.0, float(value)))
     return 0.0
 
 
-def _repair_offsets(
+def _find_unused_occurrence(
     text: str,
-    start: Optional[int],
-    end: Optional[int],
     span_text: str,
+    used_ranges: list[tuple[int, int]],
 ) -> Optional[tuple[int, int]]:
-    text_length = len(text)
-    if start is not None and end is not None and 0 <= start < end <= text_length:
-        if text[start:end] == span_text:
-            return start, end
-
     if not span_text:
         return None
 
-    repaired_start = text.find(span_text)
-    if repaired_start == -1:
-        return None
-    return repaired_start, repaired_start + len(span_text)
+    search_start = 0
+    while True:
+        start = text.find(span_text, search_start)
+        if start == -1:
+            return None
+
+        end = start + len(span_text)
+        overlaps_existing = any(start < used_end and end > used_start for used_start, used_end in used_ranges)
+        if not overlaps_existing:
+            return start, end
+        search_start = start + 1
 
 
 def _parse_spans(text: str, payload: Any) -> list[Span]:
@@ -106,6 +116,8 @@ def _parse_spans(text: str, payload: Any) -> list[Span]:
         return []
 
     spans: list[Span] = []
+    used_ranges: list[tuple[int, int]] = []
+
     for item in payload:
         if not isinstance(item, dict):
             continue
@@ -114,16 +126,13 @@ def _parse_spans(text: str, payload: Any) -> list[Span]:
         if not isinstance(span_text, str):
             continue
 
-        repaired = _repair_offsets(
-            text=text,
-            start=_coerce_int(item.get("start")),
-            end=_coerce_int(item.get("end")),
-            span_text=span_text,
-        )
+        repaired = _find_unused_occurrence(text, span_text, used_ranges)
         if repaired is None:
             continue
 
         start, end = repaired
+        used_ranges.append((start, end))
+
         try:
             spans.append(
                 Span(
@@ -134,7 +143,7 @@ def _parse_spans(text: str, payload: Any) -> list[Span]:
                     type=_coerce_span_type(item.get("type")),
                     confidence=_coerce_confidence(item.get("confidence")),
                     explanation=str(item.get("explanation") or "LLM-detected possible PII."),
-                    pattern_matched=str(item.get("pattern_matched") or "LLM structured detection."),
+                    pattern_matched=str(item.get("pattern_matched") or "LLM semantic detection."),
                     is_suggested=True,
                     potentially_missed=False,
                     decision=None,
@@ -144,6 +153,41 @@ def _parse_spans(text: str, payload: Any) -> list[Span]:
             continue
 
     return spans
+
+
+def _extract_content(response_json: dict[str, Any]) -> str:
+    choices = response_json.get("choices")
+    if not isinstance(choices, list) or not choices:
+        raise RuntimeError(
+            f"LLM response missing choices. Preview: {json.dumps(response_json)[:500]}"
+        )
+
+    first_choice = choices[0]
+    if not isinstance(first_choice, dict):
+        raise RuntimeError("LLM response choices[0] was not an object.")
+
+    message = first_choice.get("message")
+    if not isinstance(message, dict):
+        raise RuntimeError(
+            f"LLM response missing message content. Preview: {json.dumps(first_choice)[:500]}"
+        )
+
+    content = message.get("content")
+    if isinstance(content, str):
+        return content
+
+    if isinstance(content, list):
+        text_parts = [
+            item.get("text", "")
+            for item in content
+            if isinstance(item, dict) and isinstance(item.get("text"), str)
+        ]
+        if text_parts:
+            return "\n".join(text_parts)
+
+    raise RuntimeError(
+        f"LLM response missing usable content. Preview: {json.dumps(message)[:500]}"
+    )
 
 
 async def detect_llm(text: str, mode: str) -> list[Span]:
@@ -160,9 +204,10 @@ async def detect_llm(text: str, mode: str) -> list[Span]:
         "model": model,
         "messages": [
             {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": _build_prompt(text, mode)},
+            {"role": "user", "content": _build_prompt(text)},
         ],
         "temperature": 0,
+        "max_tokens": 1200,
     }
 
     async with httpx.AsyncClient(timeout=timeout_seconds) as client:
@@ -179,7 +224,15 @@ async def detect_llm(text: str, mode: str) -> list[Span]:
             raise RuntimeError(
                 f"LLM request failed with status {response.status_code}: {preview}"
             )
-        content = response.json()["choices"][0]["message"]["content"]
 
-    parsed = json.loads(_strip_json_fences(content))
+        response_json = response.json()
+        content = _extract_content(response_json)
+
+    try:
+        parsed = json.loads(_extract_json_array(content))
+    except json.JSONDecodeError as error:
+        raise RuntimeError(
+            f"LLM returned unparsable JSON array: {error}. Preview: {content[:500]}"
+        ) from error
+
     return _parse_spans(text, parsed)
