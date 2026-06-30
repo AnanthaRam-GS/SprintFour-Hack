@@ -1,5 +1,6 @@
 import os
 
+from config import load_backend_env
 from models import Span, SpanType
 from services.llm_detector import detect_llm
 from services.mock_detector import detect_mock, make_span
@@ -50,6 +51,7 @@ def _ensure_correction_demo_spans(text: str, spans: list[Span]) -> list[Span]:
 
 
 async def detect_pii(text: str, mode: str) -> list[Span]:
+    load_backend_env()
     use_llm = os.getenv("USE_LLM", "").lower() == "true"
 
     if not use_llm:

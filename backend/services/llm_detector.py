@@ -5,6 +5,7 @@ from uuid import uuid4
 
 import httpx
 
+from config import load_backend_env
 from models import Span, SpanType
 
 SYSTEM_PROMPT = "You are a strict PII detection engine. Return only valid JSON."
@@ -146,6 +147,7 @@ def _parse_spans(text: str, payload: Any) -> list[Span]:
 
 
 async def detect_llm(text: str, mode: str) -> list[Span]:
+    load_backend_env()
     api_key = os.getenv("LLM_API_KEY", "").strip()
     if not api_key:
         raise RuntimeError("LLM_API_KEY is required when USE_LLM=true")
