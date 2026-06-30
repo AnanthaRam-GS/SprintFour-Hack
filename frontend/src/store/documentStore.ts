@@ -59,14 +59,22 @@ export const useDocumentStore = create<DocumentReviewState>((set, get) => ({
   ...initialState,
 
   loadAnalysis: (result) => {
+    const spans = result.spans.map((span) => ({ ...span }));
+    const decisions = spans.reduce<Record<string, SpanAction>>((acc, span) => {
+      if (span.decision) {
+        acc[span.id] = span.decision;
+      }
+      return acc;
+    }, {});
+
     set({
       sessionId: result.session_id,
       document: result.document,
       mode: result.mode,
-      spans: result.spans.map((span) => ({ ...span })),
+      spans,
       activeSpanId: null,
       threshold: 0,
-      decisions: {},
+      decisions,
       actionHistory: [],
     });
   },

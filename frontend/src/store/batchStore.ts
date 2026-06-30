@@ -45,6 +45,7 @@ type BatchState = {
   setJobResult: (jobId: string, result: AnalysisResult) => void;
   setJobFailed: (jobId: string, error: string) => void;
   setActiveJob: (jobId: string | null) => void;
+  syncJobSpans: (jobId: string, spans: Span[]) => void;
   markApproved: (jobId: string) => void;
   markRejected: (jobId: string) => void;
   resetBatch: () => void;
@@ -128,6 +129,15 @@ export const useBatchStore = create<BatchState>((set, get) => ({
 
   setActiveJob: (jobId) => {
     set({ activeJobId: jobId });
+  },
+
+  syncJobSpans: (jobId, spans) => {
+    set((state) => ({
+      jobs: updateJob(state.jobs, jobId, (job) => ({
+        ...job,
+        spans: spans.map((span) => ({ ...span })),
+      })),
+    }));
   },
 
   markApproved: (jobId) => {
