@@ -23,7 +23,7 @@ Patient Zero was mentioned in the incident summary, but the team treated it as a
 The draft also noted December 14 as the date the sample freezer was reopened, which may not be a birth date at all.
 During a rushed review, the desk line 555-0147 stayed visible in a sidebar note.
 Another paragraph still references James Whitfield as the billing contact for the disputed transfer.
-Sam needs to catch both harmless false positives and the sensitive details that may have slipped through.`;
+Reviewers need to catch both harmless false positives and the sensitive details that may have slipped through.`;
 
 type SelectedRange = {
   text: string;
@@ -221,16 +221,16 @@ export default function CorrectionPage() {
   return (
     <main className="px-6 py-10">
       <div className="mx-auto flex max-w-6xl flex-col gap-8">
-        <section className="rounded-[2rem] bg-white p-6 shadow-sm">
+        <section className="rounded-[2rem] border border-stone-200 bg-white p-8 shadow-sm">
           <div className="flex flex-col gap-3">
-            <p className="text-sm font-semibold uppercase tracking-[0.3em] text-amber-700">
-              Correction Mode / Sam
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-700">
+              Correction Review
             </p>
-            <h1 className="text-3xl font-semibold tracking-tight text-stone-950">
+            <h1 className="text-3xl font-bold tracking-tight text-stone-950">
               Correction Review
             </h1>
             <p className="max-w-3xl text-sm leading-7 text-stone-600">
-              For Sam: catch false positives and missed PII before exporting.
+              Catch missed sensitive data and remove false positives before final export. Review possible mistakes, catch missed sensitive information, and confirm the final redaction set.
             </p>
           </div>
 

@@ -20,20 +20,20 @@ function getOriginLabel(span: Span): string {
 export function ExplanationPanel({ activeSpan }: ExplanationPanelProps) {
   if (!activeSpan) {
     return (
-      <aside className="rounded-[2rem] border border-dashed border-stone-300 bg-stone-50 p-6 text-sm leading-7 text-stone-500">
+      <aside className="rounded-[2rem] border border-dashed border-stone-200 bg-stone-50/50 p-8 text-sm leading-relaxed text-stone-500 text-center">
         Select a highlighted item to understand why it was flagged.
       </aside>
     );
   }
 
   return (
-    <aside className="rounded-[2rem] border border-stone-200 bg-white p-6 shadow-sm">
-      <div className="space-y-5">
+    <aside className="rounded-[2rem] border border-stone-200 bg-white p-8 shadow-sm">
+      <div className="space-y-6">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-stone-500">
+          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-stone-400">
             Explanation
           </p>
-          <p className="mt-3 text-xl font-semibold text-stone-950">
+          <p className="mt-3 text-2xl font-bold text-stone-950 leading-tight">
             &quot;{activeSpan.text}&quot;
           </p>
         </div>
@@ -43,31 +43,33 @@ export function ExplanationPanel({ activeSpan }: ExplanationPanelProps) {
             {getSpanTypeLabel(activeSpan.type)}
           </span>
           <ConfidenceBadge confidence={activeSpan.confidence} />
-          <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-800">
+          <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-800 border border-emerald-100/50">
             {getOriginLabel(activeSpan)}
           </span>
         </div>
 
-        <div className="space-y-4 text-sm leading-7 text-stone-700">
+        <div className="space-y-5 text-sm leading-relaxed text-stone-700">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-stone-400">
               Why it was flagged
             </p>
-            <p className="mt-2">{activeSpan.explanation}</p>
+            <p className="mt-2 text-stone-600">{activeSpan.explanation}</p>
           </div>
 
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-stone-400">
               Pattern matched
             </p>
-            <p className="mt-2">{activeSpan.pattern_matched}</p>
+            <code className="mt-2 block rounded-lg bg-stone-50 border border-stone-100 px-3 py-1.5 text-xs text-stone-600 font-mono">
+              {activeSpan.pattern_matched}
+            </code>
           </div>
 
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">
+          <div className="border-t border-stone-100 pt-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-stone-400">
               Trust note
             </p>
-            <p className="mt-2 text-stone-600">
+            <p className="mt-2 text-xs text-stone-500 leading-relaxed">
               This explanation is shown so the redaction decision can be
               reviewed instead of blindly trusted.
             </p>

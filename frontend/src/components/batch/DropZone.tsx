@@ -45,18 +45,17 @@ export function DropZone({
       }`}
     >
       <input {...getInputProps()} />
-      <p className="text-sm font-semibold uppercase tracking-[0.25em] text-stone-500">
+      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-stone-400">
         Batch Intake
       </p>
-      <h2 className="mt-3 text-2xl font-semibold text-stone-950">
+      <h2 className="mt-3 text-2xl font-bold text-stone-950 tracking-tight">
         Upload multiple .txt files
       </h2>
-      <p className="mt-3 text-sm leading-7 text-stone-600">
-        Drag and drop text files here, or click to select a few sample
-        documents for Maya&apos;s queue.
+      <p className="mt-3 text-xs leading-relaxed text-stone-500 max-w-md mx-auto">
+        Drag and drop text files here, or click to select documents for the queue.
       </p>
-      <p className="mt-4 text-xs text-stone-500">
-        MVP scope: plain text documents only, with one analyze request per file.
+      <p className="mt-4 text-[11px] text-stone-400 italic">
+        Supported format: Plain text (.txt) documents only.
       </p>
 
       {fileRejections.length > 0 ? (

@@ -241,17 +241,16 @@ export default function BatchPage() {
   return (
     <main className="px-6 py-10">
       <div className="mx-auto flex max-w-7xl flex-col gap-8">
-        <section className="rounded-[2rem] bg-white p-6 shadow-sm">
+        <section className="rounded-[2rem] border border-stone-200 bg-white p-8 shadow-sm">
           <div className="flex flex-col gap-3">
-            <p className="text-sm font-semibold uppercase tracking-[0.3em] text-sky-700">
-              Batch Mode / Maya
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-700">
+              Batch Review
             </p>
-            <h1 className="text-3xl font-semibold tracking-tight text-stone-950">
+            <h1 className="text-3xl font-bold tracking-tight text-stone-950">
               Batch Review
             </h1>
             <p className="max-w-3xl text-sm leading-7 text-stone-600">
-              For Maya: process many documents quickly without losing
-              auditability.
+              Review multiple documents quickly with a lightweight high-volume queue. Batch Mode uses frontend-driven processing for this MVP. Individual reviewed exports are available.
             </p>
           </div>
 
@@ -259,9 +258,8 @@ export default function BatchPage() {
             <DropZone onFilesSelected={(files) => void handleFilesSelected(files)} disabled={isUploading} />
           </div>
 
-          <p className="mt-4 text-sm leading-7 text-stone-500">
-            Upload a few .txt files to simulate Maya&apos;s high-volume review
-            queue.
+          <p className="mt-4 text-xs text-stone-400">
+            Upload a few .txt files to simulate the high-volume review queue.
           </p>
 
           {error ? (
@@ -379,14 +377,12 @@ export default function BatchPage() {
                 </div>
               </>
             ) : (
-              <div className="rounded-[2rem] border border-dashed border-stone-300 bg-stone-50 px-6 py-10 text-center text-stone-500">
-                <h2 className="text-2xl font-semibold text-stone-900">
+              <div className="rounded-[2rem] border border-dashed border-stone-250 bg-stone-50/50 px-6 py-12 text-center text-stone-550">
+                <h2 className="text-xl font-bold text-stone-900">
                   No active review file yet
                 </h2>
-                <p className="mt-3 text-sm leading-7">
-                  Upload a few .txt files to simulate Maya&apos;s high-volume
-                  review queue, then select one to inspect its spans and export
-                  decisions.
+                <p className="mt-3 text-xs leading-relaxed text-stone-550 max-w-md mx-auto">
+                  Upload a few .txt files to build the review queue, then select a file to inspect detected spans and approve redactions.
                 </p>
               </div>
             )}

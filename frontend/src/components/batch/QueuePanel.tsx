@@ -37,9 +37,8 @@ export function QueuePanel({
       </div>
 
       {jobs.length === 0 ? (
-        <p className="mt-5 rounded-2xl border border-dashed border-stone-200 bg-stone-50 px-4 py-5 text-sm leading-7 text-stone-500">
-          No batch jobs yet. Upload a few text files to build Maya&apos;s review
-          queue.
+        <p className="mt-5 rounded-2xl border border-dashed border-stone-200 bg-stone-50/50 px-4 py-6 text-xs text-stone-450 text-center leading-relaxed">
+          No batch jobs queued. Upload plain text files to begin.
         </p>
       ) : (
         <div className="mt-5 space-y-3">

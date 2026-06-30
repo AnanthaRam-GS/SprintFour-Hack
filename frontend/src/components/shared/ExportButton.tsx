@@ -25,7 +25,7 @@ export function ExportButton({
       type="button"
       onClick={handleClick}
       disabled={isDisabled}
-      className="rounded-full bg-stone-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-stone-700 disabled:cursor-not-allowed disabled:bg-stone-300 disabled:text-stone-500"
+      className="rounded-full bg-stone-900 px-4 py-2 text-xs font-semibold text-white transition hover:bg-stone-800 disabled:cursor-not-allowed disabled:bg-stone-100 disabled:text-stone-400 border border-stone-200"
     >
       {label}
     </button>

@@ -6,24 +6,20 @@ import { usePathname } from "next/navigation";
 type NavItem = {
   href: string;
   title: string;
-  subtitle: string;
 };
 
 const navItems: NavItem[] = [
   {
     href: "/trust",
-    title: "Trust Mode",
-    subtitle: "Marcus",
+    title: "Trust Review",
   },
   {
     href: "/correction",
-    title: "Correction Mode",
-    subtitle: "Sam",
+    title: "Correction Review",
   },
   {
     href: "/batch",
-    title: "Batch Mode",
-    subtitle: "Maya / lightweight queue",
+    title: "Batch Review",
   },
 ];
 
@@ -31,22 +27,26 @@ export function ModeNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="border-b border-stone-200 bg-white/90 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl flex-col gap-4 px-6 py-4 lg:flex-row lg:items-center lg:justify-between">
-        <div>
+    <nav className="sticky top-0 z-50 border-b border-stone-200/80 bg-white/80 backdrop-blur-md">
+      <div className="mx-auto flex max-w-6xl flex-col gap-4 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="space-y-1">
           <Link
             href="/"
-            className="text-sm font-semibold uppercase tracking-[0.3em] text-stone-500"
+            className="flex items-center gap-2 group"
           >
-            Conseal Hackathon
+            <span className="text-lg font-bold tracking-tight text-stone-950 group-hover:text-emerald-700 transition-colors">
+              Conseal
+            </span>
+            <span className="rounded-full bg-stone-100/80 px-2 py-0.5 text-[11px] font-medium text-stone-600 border border-stone-200/50">
+              AI Privacy Review
+            </span>
           </Link>
-          <p className="mt-1 text-sm text-stone-600">
-            Shared review engine for trust, correction, and lightweight batch
-            review workflows.
+          <p className="text-xs text-stone-500">
+            Review sensitive information before sharing documents with AI.
           </p>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-3">
+        <div className="flex flex-wrap items-center gap-2">
           {navItems.map((item) => {
             const isActive = pathname === item.href;
 
@@ -54,20 +54,13 @@ export function ModeNav() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`rounded-2xl border px-4 py-3 transition ${
+                className={`rounded-full px-4 py-2 text-sm font-semibold transition-all duration-150 ${
                   isActive
-                    ? "border-stone-900 bg-stone-900 text-white shadow-sm"
-                    : "border-stone-200 bg-stone-50 text-stone-700 hover:border-stone-300 hover:bg-stone-100"
+                    ? "bg-stone-900 text-stone-50 shadow-sm"
+                    : "text-stone-600 hover:bg-stone-100/85 hover:text-stone-950"
                 }`}
               >
-                <p className="text-sm font-semibold">{item.title}</p>
-                <p
-                  className={`mt-1 text-xs ${
-                    isActive ? "text-stone-300" : "text-stone-500"
-                  }`}
-                >
-                  Persona: {item.subtitle}
-                </p>
+                {item.title}
               </Link>
             );
           })}

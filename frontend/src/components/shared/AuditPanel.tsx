@@ -35,16 +35,16 @@ export function AuditPanel({
   if (items.length === 0) {
     return (
       <aside
-        className={`rounded-3xl border border-dashed border-stone-300 bg-stone-50 px-5 py-4 text-sm text-stone-500 ${className}`}
+        className={`rounded-[2rem] border border-dashed border-stone-200 bg-stone-50/50 p-6 text-xs text-stone-500 text-center leading-relaxed ${className}`}
       >
-        No review actions yet.
+        No review actions audited.
       </aside>
     );
   }
 
   return (
     <aside
-      className={`rounded-3xl border border-stone-200 bg-white p-4 shadow-sm ${className}`}
+      className={`rounded-[2rem] border border-stone-200 bg-white p-6 shadow-sm ${className}`}
     >
       <div className="space-y-3">
         {items.map(({ span, action }) => (

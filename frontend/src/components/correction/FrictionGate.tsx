@@ -22,49 +22,46 @@ export function FrictionGate({
   return (
     <Dialog.Root open={open} onOpenChange={(nextOpen) => !nextOpen && onCancel()}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-40 bg-stone-950/50 backdrop-blur-sm" />
-        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-[min(92vw,640px)] -translate-x-1/2 -translate-y-1/2 rounded-[2rem] bg-white p-6 shadow-2xl">
-          <Dialog.Title className="text-2xl font-semibold text-stone-950">
-            Review may be too fast
+        <Dialog.Overlay className="fixed inset-0 z-40 bg-stone-950/40 backdrop-blur-sm transition-opacity" />
+        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-[min(92vw,600px)] -translate-x-1/2 -translate-y-1/2 rounded-[2.5rem] bg-white p-8 border border-stone-200/60 shadow-2xl transition-all">
+          <Dialog.Title className="text-2xl font-bold text-stone-950 tracking-tight">
+            Redaction Quality Warning
           </Dialog.Title>
-          <Dialog.Description className="mt-3 text-sm leading-7 text-stone-600">
-            There are still low-confidence or missed items that have not been
-            reviewed.
+          <Dialog.Description className="mt-2.5 text-sm leading-relaxed text-stone-550">
+            There are low-confidence or potentially missed sensitive items that have not been audited. Exporting now may risk leaking private credentials or identifiers.
           </Dialog.Description>
 
-          <div className="mt-5 space-y-3">
+          <div className="mt-6 space-y-2.5 max-h-[220px] overflow-y-auto pr-1">
             {pendingLowConfidenceSpans.slice(0, 5).map((span) => (
               <div
                 key={span.id}
-                className="rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3"
+                className="rounded-2xl border border-stone-150 bg-stone-50/50 px-4 py-3 flex items-center justify-between gap-3"
               >
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-sm font-medium text-stone-900">
-                      &quot;{span.text}&quot;
-                    </p>
-                    <p className="mt-1 text-xs text-stone-600">
-                      {getSpanTypeLabel(span.type)}
-                    </p>
-                  </div>
-                  <ConfidenceBadge confidence={span.confidence} />
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-stone-900 truncate">
+                    &quot;{span.text}&quot;
+                  </p>
+                  <p className="mt-0.5 text-xs text-stone-500">
+                    {getSpanTypeLabel(span.type)}
+                  </p>
                 </div>
+                <ConfidenceBadge confidence={span.confidence} />
               </div>
             ))}
           </div>
 
-          <div className="mt-6 flex flex-wrap justify-end gap-3">
+          <div className="mt-8 flex flex-wrap justify-end gap-3 border-t border-stone-100 pt-5">
             <button
               type="button"
               onClick={onCancel}
-              className="rounded-full border border-stone-300 px-4 py-2 text-sm font-semibold text-stone-700 transition hover:bg-stone-100"
+              className="rounded-full border border-stone-300 px-5 py-2 text-xs font-semibold text-stone-700 transition hover:bg-stone-50"
             >
               Go back and review
             </button>
             <button
               type="button"
               onClick={onConfirm}
-              className="rounded-full bg-stone-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-stone-800"
+              className="rounded-full bg-rose-600 px-5 py-2 text-xs font-semibold text-white transition hover:bg-rose-700"
             >
               Export anyway
             </button>

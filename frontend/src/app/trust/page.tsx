@@ -105,17 +105,16 @@ export default function TrustPage() {
   return (
     <main className="px-6 py-10">
       <div className="mx-auto flex max-w-6xl flex-col gap-8">
-        <section className="rounded-[2rem] bg-white p-6 shadow-sm">
+        <section className="rounded-[2rem] border border-stone-200 bg-white p-8 shadow-sm">
           <div className="flex flex-col gap-3">
-            <p className="text-sm font-semibold uppercase tracking-[0.3em] text-emerald-700">
-              Trust Mode / Marcus
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-700">
+              Trust Review
             </p>
-            <h1 className="text-3xl font-semibold tracking-tight text-stone-950">
-              Trust &amp; Explainability
+            <h1 className="text-3xl font-bold tracking-tight text-stone-950">
+              Trust Review
             </h1>
             <p className="max-w-3xl text-sm leading-7 text-stone-600">
-              For Marcus: review every redaction with evidence before sharing
-              the document.
+              Understand why each sensitive item was flagged before exporting a safe copy. Inspect every detected sensitive item with confidence scores, reasoning, and a complete review trail.
             </p>
           </div>
 

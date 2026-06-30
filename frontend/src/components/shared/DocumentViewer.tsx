@@ -21,9 +21,9 @@ export function DocumentViewer({
   if (!text) {
     return (
       <section
-        className={`rounded-3xl border border-dashed border-stone-300 bg-stone-50 p-8 text-sm text-stone-500 ${className}`}
+        className={`rounded-3xl border border-dashed border-stone-200 bg-stone-50/50 p-8 text-sm text-stone-500 text-center leading-relaxed ${className}`}
       >
-        No document text available yet.
+        No document text analyzed yet.
       </section>
     );
   }
@@ -32,7 +32,7 @@ export function DocumentViewer({
 
   return (
     <section
-      className={`rounded-3xl border border-stone-200 bg-white p-6 text-sm leading-7 text-stone-800 shadow-sm ${className}`}
+      className={`rounded-3xl border border-stone-200 bg-white p-8 text-sm leading-relaxed text-stone-800 shadow-sm ${className}`}
     >
       <div className="whitespace-pre-wrap break-words font-[family-name:var(--font-geist-sans)]">
         {segments.map((segment) => {

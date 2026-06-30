@@ -10,25 +10,25 @@ export function ThroughputBadge({
   throughput,
 }: ThroughputBadgeProps) {
   return (
-    <section className="rounded-[2rem] border border-stone-200 bg-white p-5 shadow-sm">
-      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">
-        Throughput
+    <section className="rounded-[2rem] border border-stone-200 bg-white p-6 shadow-sm">
+      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-stone-400">
+        Throughput Metrics
       </p>
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
-        <div className="rounded-2xl bg-stone-100 px-4 py-3">
-          <p className="text-xs uppercase tracking-[0.2em] text-stone-500">
+        <div className="rounded-2xl bg-stone-50 border border-stone-100 px-4 py-3">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-stone-400">
             Total files
           </p>
-          <p className="mt-2 text-2xl font-semibold text-stone-950">
+          <p className="mt-1.5 text-2xl font-bold text-stone-900 leading-none">
             {counts.total}
           </p>
         </div>
 
-        <div className="rounded-2xl bg-stone-100 px-4 py-3">
-          <p className="text-xs uppercase tracking-[0.2em] text-stone-500">
+        <div className="rounded-2xl bg-stone-50 border border-stone-100 px-4 py-3">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-stone-400">
             Files / hour
           </p>
-          <p className="mt-2 text-2xl font-semibold text-stone-950">
+          <p className="mt-1.5 text-2xl font-bold text-stone-900 leading-none">
             {throughput.filesPerHour ?? "—"}
           </p>
         </div>
