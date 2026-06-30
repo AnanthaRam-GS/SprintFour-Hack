@@ -1,7 +1,20 @@
-# Conseal Hackathon Writeup
+# Conseal Writeup
 
-Conseal is a unified PII review system built around three different reviewer needs: Marcus needs trust and explainability, Sam needs protection from false positives and missed PII, and Maya needs a fast high-volume workflow. Rather than building three disconnected demos, this project uses one shared review engine across all three modes so the important work happens once: document rendering, span actions, audit logging, and export.
+Conseal is a deployable MVP for reviewing sensitive information before documents are shared with AI systems. The product is built around a simple idea: detection alone is not enough. Users need to understand what was flagged, correct mistakes, and export a reviewed document with an audit trail. That requirement shaped both the architecture and the feature choices.
 
-The strongest parts of the build are Trust Mode and Correction Mode. Trust Mode focuses on why a redaction happened and why visible text was kept visible. Correction Mode focuses on behavioral safety by surfacing missed PII, slowing down overconfident exports, and allowing manual reviewer-added spans. Batch Mode is intentionally lighter: it is frontend-driven, processes `.txt` files one at a time through the existing analyze API, and reuses the same review UI instead of introducing a separate backend queue.
+The implementation focuses on three review workflows:
 
-Several things were intentionally not built. There is no auth, no database, no PDF/DOCX parsing, no backend batch queue, and no bulk batch ZIP export. Those cuts are deliberate for an 8-hour solo hackathon build. The goal was to spend time on review UX, auditability, and tradeoff clarity rather than infrastructure that would not materially improve the demo. The detector is also mock-first by default because the hackathon allowed mock detection and the safer decision was to keep the demo reliable; an optional OpenAI-compatible LLM path was added with automatic fallback to mock if anything fails.
+- **Trust Review**
+  - helps users inspect why content was flagged and why visible content was left alone
+- **Correction Review**
+  - helps users catch missed PII, reject false positives, and slow down overconfident review
+- **Batch Review**
+  - provides a lightweight queue for processing multiple text files without building a full backend job system
+
+The most important architectural decision was to build one shared review engine instead of three disconnected demos. The document viewer, span highlights, action bar, audit panel, export flow, and core review state are reused across all modes. That keeps the codebase smaller, makes behavior more consistent, and demonstrates a stronger systems design story for the hackathon.
+
+The detector strategy is intentionally pragmatic. Conseal supports an optional OpenAI-compatible LLM detector, but it does not depend on one. If LLM detection fails, the backend falls back to a deterministic heuristic detector that can still catch common names, emails, phones, IDs, addresses, SSNs, and DOB-style values. This keeps the demo reliable even when cloud connectivity or provider behavior is unstable.
+
+Several scope cuts were deliberate. There is no auth, no database, no PDF or DOCX parsing, no backend batch queue, and no bulk batch ZIP export. Those cuts were made to keep the project focused on review quality, explainability, correction behavior, and audited export rather than infrastructure-heavy features that would dilute the core product story in a limited build window.
+
+Conseal is not presented as a production-ready platform. It is a strong prototype that demonstrates the review layer needed between raw detection and safe AI document sharing.
