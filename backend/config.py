@@ -4,6 +4,8 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 _ENV_LOADED = False
+BASE_DIR = Path(__file__).resolve().parent
+ENV_PATH = BASE_DIR / ".env"
 
 
 def load_backend_env() -> None:
@@ -11,9 +13,7 @@ def load_backend_env() -> None:
     if _ENV_LOADED:
         return
 
-    backend_dir = Path(__file__).resolve().parent
-    env_path = backend_dir / ".env"
-    load_dotenv(dotenv_path=env_path, override=False)
+    load_dotenv(dotenv_path=ENV_PATH, override=False)
     load_dotenv(override=False)
     _ENV_LOADED = True
 

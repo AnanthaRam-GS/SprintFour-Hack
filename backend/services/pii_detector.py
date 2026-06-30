@@ -53,16 +53,21 @@ def _ensure_correction_demo_spans(text: str, spans: list[Span]) -> list[Span]:
 async def detect_pii(text: str, mode: str) -> list[Span]:
     load_backend_env()
     use_llm = os.getenv("USE_LLM", "").lower() == "true"
+    print(f"USE_LLM={use_llm}")
 
     if not use_llm:
+        print("Using mock detector")
         return detect_mock(text, mode)
 
     try:
+        print("Using LLM detector")
         spans = await detect_llm(text, mode)
         if mode == "correction":
             spans = _ensure_correction_demo_spans(text, spans)
         if spans:
+            print(f"LLM detector returned {len(spans)} spans")
             return spans
+        print("LLM detector returned 0 spans, falling back to mock")
     except Exception as error:
         print(f"LLM detection failed, falling back to mock: {error}")
 

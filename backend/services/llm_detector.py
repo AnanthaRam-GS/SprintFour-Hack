@@ -174,7 +174,11 @@ async def detect_llm(text: str, mode: str) -> list[Span]:
             },
             json=payload,
         )
-        response.raise_for_status()
+        if response.status_code != 200:
+            preview = response.text[:500]
+            raise RuntimeError(
+                f"LLM request failed with status {response.status_code}: {preview}"
+            )
         content = response.json()["choices"][0]["message"]["content"]
 
     parsed = json.loads(_strip_json_fences(content))

@@ -136,6 +136,11 @@ def _fallback_regex_detection(text: str) -> list[Span]:
     phone_pattern = re.compile(
         r"(?:(?:\+?\d{1,2}[\s.-]?)?(?:\(\d{3}\)|\d{3})[\s.-]?\d{3}[\s.-]?\d{4}|\b\d{3}[-.]\d{4}\b)"
     )
+    id_pattern = re.compile(r"\b(?:EMP|ACC|CASE)-\d{5,}\b")
+    name_pattern = re.compile(r"\b([A-Z][a-z]+ [A-Z][a-z]+)\b")
+    address_pattern = re.compile(
+        r"\b\d{1,5}\s+[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\s+(?:Street|Avenue|Road|Lane|Drive|Boulevard|Court|Way)\b"
+    )
 
     for match in email_pattern.finditer(text):
         spans.append(
@@ -165,7 +170,62 @@ def _fallback_regex_detection(text: str) -> list[Span]:
             )
         )
 
-    return spans
+    for match in id_pattern.finditer(text):
+        spans.append(
+            Span(
+                id=str(uuid4()),
+                start=match.start(),
+                end=match.end(),
+                text=match.group(0),
+                type=SpanType.ID_NUMBER,
+                confidence=0.83,
+                explanation="This matches a structured employee, account, or case identifier format.",
+                pattern_matched="Regex fallback for EMP/ACC/CASE identifiers.",
+            )
+        )
+
+    for match in name_pattern.finditer(text):
+        full_name = match.group(1)
+        if full_name in {"Employee Onboarding", "Mission Street", "Park Avenue"}:
+            continue
+        spans.append(
+            Span(
+                id=str(uuid4()),
+                start=match.start(1),
+                end=match.end(1),
+                text=full_name,
+                type=SpanType.NAME,
+                confidence=0.68,
+                explanation="This matches a simple capitalized first-and-last-name pattern.",
+                pattern_matched="Regex fallback for capitalized full names.",
+            )
+        )
+
+    for match in address_pattern.finditer(text):
+        spans.append(
+            Span(
+                id=str(uuid4()),
+                start=match.start(),
+                end=match.end(),
+                text=match.group(0),
+                type=SpanType.ADDRESS,
+                confidence=0.79,
+                explanation="This matches a simple street-address pattern with a numeric prefix.",
+                pattern_matched="Regex fallback for street-style addresses.",
+            )
+        )
+
+    spans.sort(key=lambda span: (span.start, span.end))
+    deduplicated: list[Span] = []
+    seen: set[tuple[int, int, SpanType]] = set()
+    for span in spans:
+        key = (span.start, span.end, span.type)
+        if key in seen:
+            continue
+        seen.add(key)
+        deduplicated.append(span)
+
+    return deduplicated
 
 
 def detect_mock(text: str, mode: str) -> list[Span]:
