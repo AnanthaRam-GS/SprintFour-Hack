@@ -1,0 +1,32 @@
+type ExportButtonProps = {
+  sessionId: string | null;
+  disabled?: boolean;
+  label?: string;
+};
+
+export function ExportButton({
+  sessionId,
+  disabled = false,
+  label = "Export redacted document",
+}: ExportButtonProps) {
+  const isDisabled = !sessionId || disabled;
+
+  const handleClick = () => {
+    if (isDisabled) {
+      return;
+    }
+
+    window.alert("Export API will be connected in the next phase.");
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={handleClick}
+      disabled={isDisabled}
+      className="rounded-full bg-stone-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-stone-700 disabled:cursor-not-allowed disabled:bg-stone-300 disabled:text-stone-500"
+    >
+      {label}
+    </button>
+  );
+}
